@@ -1,31 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package view;
 
 import controller.Manager;
 import controller.Validation;
 
 public class Menu {
-    private void menu(){
+
+    private void menu() {
         System.out.println("========Task Program========");
         System.out.println("1.Add task");
         System.out.println("2.Delete task");
         System.out.println("3.Display task");
         System.out.println("4.Exit");
     }
-    
-    public void display(){
+
+    public void display() {
         Validation v = new Validation();
-        Manager m = new Manager ();
+        Manager m = new Manager();
         int n;
-        
-        do{
+
+        do {
             menu();
             n = v.getInt("Your choice:", 1, 4);
-            switch(n){
+            switch (n) {
                 case 1:
                     m.addTask();
                     break;
@@ -38,6 +34,6 @@ public class Menu {
                 case 4:
                     break;
             }
-        } while(n != 4);
+        } while (n != 4);
     }
 }
