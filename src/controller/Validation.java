@@ -56,10 +56,11 @@ public class Validation {
         }
     }
 
-    public String getDate(String msg) {
+    public String getDate() {
+        System.out.print("Date:");
         while (true) {
             try {
-                String s = getString(msg);
+                String s = getString("");
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 Date date = dateFormat.parse(s);
                 if (s.equalsIgnoreCase(dateFormat.format(date))) {

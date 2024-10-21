@@ -9,8 +9,8 @@ public class Manager {
 
     private List<Task> listTask = new ArrayList<>();
     private Validation v = new Validation();
-    
-    private int gettaskTypeID(){
+
+    private int gettaskTypeID() {
         System.out.println("-----Description of taskType----- ");
         System.out.println("1. Code");
         System.out.println("2. Test");
@@ -19,7 +19,7 @@ public class Manager {
         int taskTypeID = v.getInt("Choose task type id:", 1, 4);
         return taskTypeID;
     }
-    
+
     public String getTaskType(int choice) {
         String s = null;
         switch (choice) {
@@ -38,6 +38,7 @@ public class Manager {
         }
         return s;
     }
+
     //add
     public void addTask() {
         int id;
@@ -50,22 +51,28 @@ public class Manager {
         String requirementName = v.getString("Requirement Name:");
         int taskTypeID = gettaskTypeID();
         String nameTaskType = getTaskType(taskTypeID);
-        String date = v.getDate("Date:");
+        String date = v.getDate();
         double planFrom = v.getDouble("From:", 8, 17.5);
-        double planTo = v.getDouble("To:", 8.5, 17.5);
+        double planTo = v.getDouble("To:", 8, 17.5);
         while (!checkTime(planFrom, planTo)) {
             System.err.println("Plan from must be less than Plan To, Please re-input.");
             planFrom = v.getDouble("From", 8, 17.5);
-            planTo = v.getDouble("To:", 8.5, 17.5);
+            planTo = v.getDouble("To:", 8, 17.5);
         }
         String assignee = v.getString("Assignee:");
         String reviewer = v.getString("Reviewer:");
         Task newTask = new Task(taskTypeID, nameTaskType, id, requirementName, date, planFrom, planTo, assignee, reviewer);
-        if (!checkDuplicate(newTask)) {
+        if (!checkWorkingHours(newTask)) {
+            System.out.println("Worker cannot work more than 8 hours per day.\nAdd fail!");
+            return;
+        }
+        if (isTimeOverlap(newTask)) {
+            System.out.println("Task time overlaps with another task.\nAdd fail!");
+            return;
+        }
+        if (checkWorkingHours(newTask) && !isTimeOverlap(newTask)) {
             listTask.add(newTask);
             System.out.println("Add successfully");
-        } else {
-            System.out.println("Duplicate task");
         }
     }
 
@@ -76,16 +83,22 @@ public class Manager {
         return false;
     }
 
-    public boolean checkDuplicate(Task newTask) {
-        for (Task oldTask : listTask) {
-            if (oldTask.getTaskType().getId() == newTask.getTaskType().getId() && oldTask.getTaskType().getName().equalsIgnoreCase(newTask.getTaskType().getName())
-                    && oldTask.getAssignee().equalsIgnoreCase(newTask.getAssignee()) && oldTask.getDate().equalsIgnoreCase(newTask.getDate())
-                    && oldTask.getPlanFrom() == newTask.getPlanFrom() && oldTask.getPlanTo() == newTask.getPlanTo()
-                    && oldTask.getRequirementName().equalsIgnoreCase(newTask.getRequirementName()) && oldTask.getReviewer().equalsIgnoreCase(newTask.getReviewer())) {
-                return true;
+    public boolean checkWorkingHours(Task newTask) {
+        double totalHours = 0;
+        totalHours += (newTask.getPlanTo() - newTask.getPlanFrom());
+        return totalHours <= 8.0;
+    }
+
+    public boolean isTimeOverlap(Task newTask) {
+        for (Task task : listTask) {
+            if (task.getAssignee().equalsIgnoreCase(newTask.getAssignee())
+                    && task.getDate().equalsIgnoreCase(newTask.getDate())) {
+                if (newTask.getPlanFrom() < task.getPlanTo() && newTask.getPlanTo() > task.getPlanFrom()) {
+                    return true; // Trùng thời gian
+                }
             }
         }
-        return false;
+        return false;// Không trùng thời gian
     }
 
     //delete
@@ -124,5 +137,5 @@ public class Manager {
             System.out.println("");
         }
     }
-    
+
 }
